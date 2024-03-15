@@ -1,0 +1,14 @@
+// home.pug
+
+html
+  head
+    title Home Page
+  body
+    h1 Welcome to the Home Page!
+    
+    h2 Your Playlists
+    each playlist in userData.playlists
+      h3 #{playlist.name}
+      ul
+        each track in playlist.tracks
+          li #{track.name} by #{track.artist}
