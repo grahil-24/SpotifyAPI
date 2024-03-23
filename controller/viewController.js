@@ -1,5 +1,4 @@
-const getMyData = require('./getUserData');
-
+const { getUserPlaylists, getPlaylistTracks } = require('./getUserData');
 exports.getLoginPage = async(req, res, next) =>{
     res.status(200).render('loginpage', {
         title: 'Login Page'
@@ -8,7 +7,8 @@ exports.getLoginPage = async(req, res, next) =>{
 
 exports.getHomepage = async(req, res, next) =>{
     try {
-        const userData = await getMyData();
+        const userData = await getUserPlaylists();
+        console.log('From getHomePage function: ');
         console.log(userData);
         res.render('home', { userData });
         } catch (error) {

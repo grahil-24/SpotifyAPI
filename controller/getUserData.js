@@ -2,36 +2,35 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const loginController = require('./loginController');
 const spotifyApi = new SpotifyWebApi();
 
-async function getMyData() {
+async function getUserPlaylists() {
     try {
         const accessToken = loginController.getAccessToken();
         spotifyApi.setAccessToken(accessToken);
-        const me = await spotifyApi.getMe();
-        console.log(me);
-        const playlists = await getUserPlaylists(me.body.id);
-        return { user: me.body, playlists };
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
 
-async function getUserPlaylists(userId) {
-    try {
+        // Get user's information
+        const me = await spotifyApi.getMe();
+        console.log('From getUserPlaylists function:');
+        console.log(me);
+
+        // Get user's playlists
+        const data = await spotifyApi.getUserPlaylists(me.body.id);
         let playlists = [];
-        const data = await spotifyApi.getUserPlaylists(userId);
         for (let playlist of data.body.items) {
             playlists.push({ name: playlist.name, id: playlist.id });
         }
-        return playlists;
+
+        return { user: me.body, playlists };
     } catch (error) {
+        console.error('From getUserPlaylists function:');
         console.error(error);
         throw error;
     }
 }
 
 async function getPlaylistTracks(playlistId) {
+    // console.log(playlistId);
     try {
+
         let tracks = [];
         let offset = 0;
         let limit = 100; // Set your desired limit here
@@ -51,9 +50,10 @@ async function getPlaylistTracks(playlistId) {
 
         return tracks;
     } catch (error) {
+        console.log('From getPlaylistTrack function: ');
         console.error(error);
         throw error;
     }
 }
 
-module.exports = getMyData;
+module.exports = { getUserPlaylists, getPlaylistTracks };
