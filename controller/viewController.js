@@ -1,4 +1,4 @@
-const { getUserPlaylists, getPlaylistTracks } = require('./getUserData');
+const { getUserPlaylists, getPlaylistTracks } = require('./dataController');
 exports.getLoginPage = async(req, res, next) =>{
     res.status(200).render('loginpage', {
         title: 'Login Page'
