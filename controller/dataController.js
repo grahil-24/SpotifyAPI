@@ -62,12 +62,14 @@ const getDuplicates = async (req, res) => {
         const tracks = await getPlaylistTracks(playlistID);
         const duplicates = []
         const set = new Set();
+        const map = new Map();
 
         tracks.forEach((track) => {
-            if(set.has(track.id)){
+            const key = track.artist+"|"+track.name;
+            if(set.has(key)){
                 duplicates.push(track);
             }else{
-                set.add(track.id);
+                set.add(key);
             }
         })
         console.log(duplicates);
