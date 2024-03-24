@@ -39,7 +39,7 @@ async function getPlaylistTracks(playlistId) {
             const data = await spotifyApi.getPlaylistTracks(playlistId, { limit, offset });
             for (let track_obj of data.body.items) {
                 const track = track_obj.track;
-                tracks.push({ name: track.name, artist: track.artists[0].name });
+                tracks.push({ name: track.name, artist: track.artists[0].name, id: track.id});
             }
             if (data.body.next) {
                 offset += limit;
@@ -56,4 +56,25 @@ async function getPlaylistTracks(playlistId) {
     }
 }
 
-module.exports = { getUserPlaylists, getPlaylistTracks };
+const getDuplicates = async (req, res) => {
+    const playlistID = req.query.playlistID;
+    try{
+        const tracks = await getPlaylistTracks(playlistID);
+        const duplicates = []
+        const set = new Set();
+
+        tracks.forEach((track) => {
+            if(set.has(track.id)){
+                duplicates.push(track);
+            }else{
+                set.add(track.id);
+            }
+        })
+        console.log(duplicates);
+        res.json(duplicates);
+    }catch (err){
+        console.log(err);
+    }
+}
+
+module.exports = { getUserPlaylists, getPlaylistTracks, getDuplicates };
