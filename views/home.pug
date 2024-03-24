@@ -5,16 +5,20 @@ html
     title Home Page
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script.
-      function getPlaylistSongs(playlistId) {
+      async function getPlaylistSongs(playlistId) {
+
+        const response = await fetch(`/home/getSongs?playlistID=${playlistId}`)
+        const movies = await response.json();
+        console.log(movies);
         // AJAX request to fetch playlist songs
-        $.get(`/home/getSongs?playlistID=${playlistId}`, function (data) {
-          console.log(playlistId);
-          // Update DOM with the fetched songs
-          $('#playlist_' + playlistId).append('<ul>');
-          data.forEach(function (track) {
-            $('#playlist_' + playlistId + ' ul').append('<li>' + track.name + ' - ' + track.artist + '</li>');
-          });
-        });
+        // $.get(`/home/getSongs?playlistID=${playlistId}`, function (data) {
+        //   console.log(playlistId);
+        //   // Update DOM with the fetched songs
+        //   $('#playlist_' + playlistId).append('<ul>');
+        //   data.forEach(function (track) {
+        //     $('#playlist_' + playlistId + ' ul').append('<li>' + track.name + ' - ' + track.artist + '</li>');
+        //   });
+        // });
       }
   body
     h1 Welcome to the Home Page!
