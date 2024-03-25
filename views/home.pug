@@ -5,8 +5,10 @@ html
     title Home Page
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script.
-      async function getPlaylistSongs(playlistId) {
-
+      async function getPlaylistSongs(playlist) {
+        const playlistId = playlist.id;
+        const snapshot_id = playlist.snapshot_id;
+        console.log(playlist);
         const response = await fetch(`/home/getSongs?playlistID=${playlistId}`)
         const data = await response.json();
         const songs = data.duplicates;
@@ -26,7 +28,7 @@ html
         // Create "Remove duplicates" button
         let removeDuplicatesButton = document.createElement("button");
         removeDuplicatesButton.textContent = "Remove duplicates";
-        removeDuplicatesButton.setAttribute("onclick", `removeDuplicates('${playlistId}', ${JSON.stringify(songs)})`)
+        removeDuplicatesButton.setAttribute("onclick", `removeDuplicates(${JSON.stringify(playlist)},${JSON.stringify(songs)})`)
         div.appendChild(removeDuplicatesButton);
 
         // AJAX request to fetch playlist songs
@@ -40,8 +42,9 @@ html
         // });
       }
 
-      async function removeDuplicates(playlistId, songs){
-        console.log(playlistId);
+      async function removeDuplicates(playlist, songs){
+        const playlistId = playlist.id;
+        console.log(playlist);
         for (var i = 0; i < songs.length; i++) {
           console.log(songs[i].id)  ;
         }
@@ -52,7 +55,10 @@ html
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({songs: songs})
+            body: JSON.stringify({
+              snapshot_id: playlist.snapshot_id,
+              songs: songs
+            })
           });
           const data = await response.json();
           console.log(data); // Assuming server responds with some data
@@ -68,5 +74,5 @@ html
         each playlist in userData.playlists
           div(id=playlist.id)
             h3 #{playlist.name}
-            button(onclick='getPlaylistSongs("'+ playlist.id +'")' ) Get songs
+            button(onclick=`getPlaylistSongs(${JSON.stringify(playlist)})`) Get songs
 
