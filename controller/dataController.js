@@ -73,10 +73,15 @@ const getDuplicates = async (req, res) => {
             }
         })
         console.log(duplicates);
-        res.json(duplicates);
+        res.json({duplicates: duplicates, playlistID: playlistID});
     }catch (err){
         console.log(err);
     }
 }
 
-module.exports = { getUserPlaylists, getPlaylistTracks, getDuplicates };
+const removeDuplicates = async (req, res) => {
+    console.log(req.query.playlistID);
+    console.log(req.body.songs);
+}
+
+module.exports = { getUserPlaylists, getPlaylistTracks, getDuplicates, removeDuplicates };
