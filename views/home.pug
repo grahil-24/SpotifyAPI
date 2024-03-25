@@ -8,8 +8,27 @@ html
       async function getPlaylistSongs(playlistId) {
 
         const response = await fetch(`/home/getSongs?playlistID=${playlistId}`)
-        const movies = await response.json();
-        console.log(movies);
+        const data = await response.json();
+        const songs = data.duplicates;
+        console.log(songs);
+        const div = document.getElementById(playlistId);
+        let ul = document.createElement("ul");
+        songs.forEach((song) => {
+          let li = document.createElement("li");
+          li.appendChild(document.createTextNode(song.name));
+          ul.appendChild(li);
+        })
+        div.appendChild(ul)
+
+        const button = div.querySelector("button");
+        button.parentNode.removeChild(button);
+
+        // Create "Remove duplicates" button
+        let removeDuplicatesButton = document.createElement("button");
+        removeDuplicatesButton.textContent = "Remove duplicates";
+        removeDuplicatesButton.setAttribute("onclick", `removeDuplicates('${playlistId}', ${JSON.stringify(songs)})`)
+        div.appendChild(removeDuplicatesButton);
+
         // AJAX request to fetch playlist songs
         // $.get(`/home/getSongs?playlistID=${playlistId}`, function (data) {
         //   console.log(playlistId);
@@ -20,11 +39,34 @@ html
         //   });
         // });
       }
+
+      async function removeDuplicates(playlistId, songs){
+        console.log(playlistId);
+        for (var i = 0; i < songs.length; i++) {
+          console.log(songs[i].id)  ;
+        }
+
+        try {
+          const response = await fetch(`/home/removeDuplicates?playlistID=${playlistId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({songs: songs})
+          });
+          const data = await response.json();
+          console.log(data); // Assuming server responds with some data
+        } catch (error) {
+          console.error('Error removing duplicates:', error);
+        }
+      }
   body
-    h1 Welcome to the Home Page!
-    
-    h2 Your Playlists
-    each playlist in userData.playlists
-      h3 #{playlist.name}
-      button(onclick='getPlaylistSongs("'+ playlist.id +'")' ) Get songs
+      h1 Welcome to the Home Page!
+
+      div(id='playlists')
+        h2 Your Playlists
+        each playlist in userData.playlists
+          div(id=playlist.id)
+            h3 #{playlist.name}
+            button(onclick='getPlaylistSongs("'+ playlist.id +'")' ) Get songs
 
