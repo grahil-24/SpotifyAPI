@@ -1,5 +1,6 @@
 const SpotifyWebApi = require('spotify-web-api-node');
 const loginController = require('./loginController');
+const bodyParser = require("body-parser");
 const spotifyApi = new SpotifyWebApi();
 
 async function getUserPlaylists() {
@@ -16,7 +17,8 @@ async function getUserPlaylists() {
         const data = await spotifyApi.getUserPlaylists(me.body.id);
         let playlists = [];
         for (let playlist of data.body.items) {
-            playlists.push({ name: playlist.name, id: playlist.id });
+            console.log(playlist)
+            playlists.push({ name: playlist.name, id: playlist.id, snapshot_id: playlist.snapshot_id});
         }
 
         return { user: me.body, playlists };
@@ -34,12 +36,13 @@ async function getPlaylistTracks(playlistId) {
         let tracks = [];
         let offset = 0;
         let limit = 100; // Set your desired limit here
-
+        let count = 0;
         while (true) {
             const data = await spotifyApi.getPlaylistTracks(playlistId, { limit, offset });
             for (let track_obj of data.body.items) {
                 const track = track_obj.track;
-                tracks.push({ name: track.name, artist: track.artists[0].name, id: track.id});
+                tracks.push({ pos: count, name: track.name, artist: track.artists[0].name, id: track.id});
+                count+=1;
             }
             if (data.body.next) {
                 offset += limit;
@@ -80,8 +83,29 @@ const getDuplicates = async (req, res) => {
 }
 
 const removeDuplicates = async (req, res) => {
-    console.log(req.query.playlistID);
-    console.log(req.body.songs);
+    const playlistId = req.query.playlistID;
+    const tracks = req.body.songs;
+    const snapshot = req.body.snapshot_id;
+    console.log(snapshot);
+    const trackPos = [];
+    tracks.forEach((track)=>{
+        trackPos.push(track.pos);
+    })
+    // console.log(playlistId);
+    // console.log(tracks);
+
+    // await spotifyApi.removeTracksFromPlaylist(playlistId, trackURIs).then(function(data) {
+    //     console.log('Tracks removed from playlist!');
+    // }, function(err) {
+    //     console.log('Something went wrong!', err);
+    // });
+
+    await spotifyApi.removeTracksFromPlaylistByPosition(playlistId, trackPos, snapshot).then(function(data) {
+        console.log('Tracks removed from playlist!');
+    }, function(err) {
+        console.log('Something went wrong!', err);
+    });
+
 }
 
 module.exports = { getUserPlaylists, getPlaylistTracks, getDuplicates, removeDuplicates };
